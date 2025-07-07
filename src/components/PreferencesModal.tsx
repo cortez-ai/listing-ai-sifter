@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { X, Plus, Trash2, Copy, ClipboardPaste } from 'lucide-react';
+import { X, Plus, Trash2, Copy, ClipboardPaste, Key } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useApp } from '@/contexts/AppContext';
 import { toast } from '@/hooks/use-toast';
+import { setOpenAIApiKey, hasOpenAIApiKey } from '@/services/aiService';
 
 interface PreferencesModalProps {
   open: boolean;
@@ -20,6 +21,8 @@ export const PreferencesModal: React.FC<PreferencesModalProps> = ({ open, onOpen
   const [newExclusion, setNewExclusion] = useState('');
   const [bulkInput, setBulkInput] = useState('');
   const [showBulkInput, setShowBulkInput] = useState(false);
+  const [apiKey, setApiKey] = useState('');
+  const [showApiKeyInput, setShowApiKeyInput] = useState(false);
 
   const handleAddInterest = () => {
     if (newInterest.trim()) {
@@ -101,6 +104,18 @@ export const PreferencesModal: React.FC<PreferencesModalProps> = ({ open, onOpen
     });
   };
 
+  const handleSaveApiKey = () => {
+    if (apiKey.trim()) {
+      setOpenAIApiKey(apiKey.trim());
+      setApiKey('');
+      setShowApiKeyInput(false);
+      toast({
+        title: "API Key Saved",
+        description: "OpenAI API key has been saved successfully.",
+      });
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto bg-gray-900 border-gray-700">
@@ -109,6 +124,60 @@ export const PreferencesModal: React.FC<PreferencesModalProps> = ({ open, onOpen
         </DialogHeader>
         
         <div className="space-y-6">
+          {/* API Key Section */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label className="text-white text-sm font-medium">
+                OpenAI API Key
+              </Label>
+              <div className="flex items-center gap-2">
+                {hasOpenAIApiKey() && (
+                  <span className="text-xs text-green-400">✓ Configured</span>
+                )}
+                <Button
+                  onClick={() => setShowApiKeyInput(!showApiKeyInput)}
+                  variant="outline"
+                  size="sm"
+                  className="border-gray-600 text-gray-300 hover:bg-gray-800"
+                >
+                  <Key className="h-4 w-4 mr-2" />
+                  {hasOpenAIApiKey() ? 'Update' : 'Add'} Key
+                </Button>
+              </div>
+            </div>
+            {showApiKeyInput && (
+              <div className="space-y-2">
+                <Input
+                  type="password"
+                  value={apiKey}
+                  onChange={(e) => setApiKey(e.target.value)}
+                  placeholder="sk-..."
+                  className="bg-gray-800 border-gray-600 text-white placeholder:text-gray-400"
+                />
+                <div className="flex gap-2">
+                  <Button
+                    onClick={handleSaveApiKey}
+                    size="sm"
+                    className="bg-teal-600 hover:bg-teal-700 text-white"
+                  >
+                    Save Key
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setApiKey('');
+                      setShowApiKeyInput(false);
+                    }}
+                    size="sm"
+                    variant="outline"
+                    className="border-gray-600 text-gray-300 hover:bg-gray-800"
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
+
           {/* Bulk Actions */}
           <div className="flex gap-2">
             <Button

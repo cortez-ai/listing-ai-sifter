@@ -1,57 +1,100 @@
 
 import { Preferences } from '@/contexts/AppContext';
 
-// Mock AI service - replace with actual AI integration
+const OPENAI_API_KEY = localStorage.getItem('openai_api_key');
+
 export const analyzeJobListings = async (
   jobListings: string,
   preferences: Preferences
 ): Promise<string> => {
   
-  // Simulate AI processing delay
-  await new Promise(resolve => setTimeout(resolve, 2000));
-  
-  // Simple mock filtering logic
-  const lines = jobListings.split('\n').filter(line => line.trim());
-  
-  // Detect if input contains job titles or descriptions
-  const avgLineLength = lines.reduce((sum, line) => sum + line.length, 0) / lines.length;
-  const isJobTitles = avgLineLength < 100; // Heuristic: shorter lines are likely titles
-  
-  const filteredLines = lines.filter(line => {
-    const lowerLine = line.toLowerCase();
-    
-    // Check if line contains any excluded terms
-    const hasExclusion = preferences.notInterested.some(term => 
-      lowerLine.includes(term.toLowerCase())
-    );
-    
-    if (hasExclusion) return false;
-    
-    // Check if line contains any interested terms (only if interests are defined)
-    if (preferences.interested.length > 0) {
-      const hasInterest = preferences.interested.some(term => 
-        lowerLine.includes(term.toLowerCase())
-      );
-      return hasInterest;
-    }
-    
-    return true;
-  });
-  
-  if (filteredLines.length === 0) {
-    return "No job listings match your preferences. Try adjusting your criteria.";
+  if (!OPENAI_API_KEY) {
+    throw new Error('OpenAI API key not found. Please add your API key in the preferences.');
   }
+
+  const interestsText = preferences.interested.length > 0 
+    ? preferences.interested.join(', ') 
+    : 'No specific interests defined';
   
-  const resultPrefix = isJobTitles 
-    ? "Filtered Job Titles:\n\n" 
-    : "Filtered Job Descriptions:\n\n";
+  const dislikesText = preferences.notInterested.length > 0 
+    ? preferences.notInterested.join(', ') 
+    : 'No specific dislikes defined';
+
+  const prompt = `You are a job filtering assistant. I will provide you with job listings and my preferences.
+
+MY INTERESTS: ${interestsText}
+MY DISLIKES (BLACKLIST - EXCLUDE THESE): ${dislikesText}
+
+IMPORTANT FILTERING RULES:
+- Only include jobs that match my interests
+- EXCLUDE any job that contains elements from my dislikes list, even if it partially matches my interests
+- The dislikes list is a BLACKLIST - any job mentioning these should be completely filtered out
+- Count the total jobs received, jobs kept, and jobs filtered out
+
+RESPONSE FORMAT:
+First, provide these statistics:
+- Jobs received: [number]
+- Jobs kept: [number] 
+- Jobs filtered out: [number]
+
+Then, determine if the input contains JOB TITLES or JOB DESCRIPTIONS:
+
+If these are JOB TITLES:
+1. Filter the titles keeping only those that match my interests and avoid my dislikes
+2. Return only the filtered titles in a bullet list
+3. Start with "List of Titles Detected:" and then list the matching titles
+
+If these are JOB DESCRIPTIONS:
+1. Filter the descriptions keeping only those that match my interests and avoid my dislikes
+2. For each relevant description, provide a brief summary (2-3 sentences)
+3. Add 1-2 bullet points explaining why it's a good match for me
+4. Start with "List of Descriptions Detected:" followed by the summaries
+
+If you're unsure if it's titles or descriptions, make your best guess based on the length and content.
+
+Here are the job listings to analyze:
+${jobListings}`;
+
+  try {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${OPENAI_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-3.5-turbo',
+        messages: [
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        max_tokens: 2000,
+        temperature: 0.3,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(`OpenAI API error: ${errorData.error?.message || 'Unknown error'}`);
+    }
+
+    const data = await response.json();
+    return data.choices[0]?.message?.content || 'No response from AI service.';
     
-  return resultPrefix + filteredLines.join('\n\n');
+  } catch (error) {
+    console.error('AI analysis failed:', error);
+    throw new Error(`Failed to analyze job listings: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
 };
 
-// TODO: Replace with actual AI service integration
-// Example integration points:
-// - OpenAI GPT API
-// - Anthropic Claude API
-// - Google Gemini API
-// - Custom AI model endpoint
+// Function to set API key
+export const setOpenAIApiKey = (apiKey: string) => {
+  localStorage.setItem('openai_api_key', apiKey);
+};
+
+// Function to check if API key exists
+export const hasOpenAIApiKey = (): boolean => {
+  return !!localStorage.getItem('openai_api_key');
+};

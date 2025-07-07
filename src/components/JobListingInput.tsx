@@ -1,10 +1,11 @@
 
 import React, { useState } from 'react';
-import { Settings, Loader2 } from 'lucide-react';
+import { Settings, Loader2, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useApp } from '@/contexts/AppContext';
 import { PreferencesModal } from './PreferencesModal';
+import { hasOpenAIApiKey } from '@/services/aiService';
 import { useNavigate } from 'react-router-dom';
 
 interface JobListingInputProps {
@@ -17,12 +18,15 @@ export const JobListingInput: React.FC<JobListingInputProps> = ({ onAnalyze, isA
   const [jobListings, setJobListings] = useState('');
   const [showPreferences, setShowPreferences] = useState(false);
   const navigate = useNavigate();
+  const hasApiKey = hasOpenAIApiKey();
 
   const handleAnalyze = () => {
     if (jobListings.trim()) {
       onAnalyze(jobListings);
     }
   };
+
+  const canAnalyze = jobListings.trim() && hasPreferences && hasApiKey && !isAnalyzing;
 
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-6">
@@ -33,6 +37,12 @@ export const JobListingInput: React.FC<JobListingInputProps> = ({ onAnalyze, isA
           {!hasPreferences && (
             <p className="text-gray-400 text-sm">
               Configure your preferences to start filtering job listings
+            </p>
+          )}
+          {!hasApiKey && (
+            <p className="text-amber-400 text-sm flex items-center gap-2">
+              <AlertCircle className="h-4 w-4" />
+              OpenAI API key required for AI analysis
             </p>
           )}
         </div>
@@ -62,22 +72,28 @@ export const JobListingInput: React.FC<JobListingInputProps> = ({ onAnalyze, isA
 
         <Button
           onClick={handleAnalyze}
-          disabled={!jobListings.trim() || !hasPreferences || isAnalyzing}
+          disabled={!canAnalyze}
           className="w-full bg-teal-600 hover:bg-teal-700 text-white py-3 text-lg font-medium disabled:opacity-50"
         >
           {isAnalyzing ? (
             <>
               <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-              Analyzing...
+              Analyzing with AI...
             </>
           ) : (
-            'Analyze Job Listings'
+            'Analyze Job Listings with AI'
           )}
         </Button>
 
         {!hasPreferences && (
           <p className="text-center text-gray-400 text-sm">
             Please set up your preferences before analyzing job listings
+          </p>
+        )}
+        
+        {!hasApiKey && (
+          <p className="text-center text-amber-400 text-sm">
+            Please add your OpenAI API key in preferences to enable AI analysis
           </p>
         )}
       </div>
