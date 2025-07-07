@@ -37,14 +37,14 @@ export const ResultsPage: React.FC = () => {
 
   if (!results) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+      <div className="min-h-screen bg-neutral-900 flex items-center justify-center">
         <div className="text-white">Loading results...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-900">
+    <div className="min-h-screen bg-neutral-900">
       <div className="max-w-4xl mx-auto p-6 space-y-6">
         {/* Header */}
         <div className="flex items-center gap-4">
@@ -60,9 +60,9 @@ export const ResultsPage: React.FC = () => {
           <h1 className="text-2xl font-bold text-white">Filtered Results</h1>
         </div>
         {/* Original Input (Collapsible) */}
-        <div className="bg-gray-800 rounded-lg border border-gray-700">
+        <div className="bg-neutral-800 rounded-lg border border-gray-700">
           <Collapsible open={showOriginal} onOpenChange={setShowOriginal}>
-            <CollapsibleTrigger className="w-full p-4 flex items-center justify-between hover:bg-gray-750 transition-colors">
+            <CollapsibleTrigger className="w-full p-4 flex items-center justify-between hover:bg-neutral-750 transition-colors">
               <span className="text-white font-medium">Original Input</span>
               {showOriginal ? (
                 <ChevronUp className="h-4 w-4 text-gray-400" />
@@ -72,7 +72,7 @@ export const ResultsPage: React.FC = () => {
             </CollapsibleTrigger>
             <CollapsibleContent>
               <div className="px-4 pb-4 pt-0">
-                <div className="bg-gray-900 rounded p-4 max-h-60 overflow-y-auto">
+                <div className="bg-neutral-900 rounded p-4 max-h-60 overflow-y-auto">
                   <pre className="text-gray-300 text-sm whitespace-pre-wrap font-mono">
                     {results.originalInput}
                   </pre>
@@ -82,11 +82,11 @@ export const ResultsPage: React.FC = () => {
           </Collapsible>
         </div>
         {/* Filtered Results */}
-        <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
+        <div className="bg-neutral-800 rounded-lg border border-gray-700 p-6">
           <h2 className="text-xl font-semibold text-white mb-4">
             Filtered Job Listings
           </h2>
-          <div className="bg-gray-900 rounded p-4">
+          <div className="bg-neutral-900 rounded p-4">
             <div className="text-gray-100 prose prose-invert max-w-none">
               <Markdown>{results.filteredResults}</Markdown>
             </div>

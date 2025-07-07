@@ -71,7 +71,7 @@ export const JobListingInput: React.FC<JobListingInputProps> = ({
             value={jobListings}
             onChange={(e) => setJobListings(e.target.value)}
             placeholder="Paste your job listings here... The AI will automatically detect whether these are job titles or full descriptions and filter them based on your preferences."
-            className="min-h-[300px] bg-gray-800 border-gray-600 text-white placeholder:text-gray-400 resize-none"
+            className="min-h-[300px] bg-neutral-800 border-gray-600 text-white placeholder:text-gray-400 resize-none"
           />
         </div>
 

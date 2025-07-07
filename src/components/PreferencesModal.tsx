@@ -146,7 +146,7 @@ export const PreferencesModal: React.FC<PreferencesModalProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto bg-gray-900 border-gray-700">
+      <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto bg-neutral-900 border-gray-700">
         <DialogHeader>
           <DialogTitle className="text-white">
             Configure Preferences
@@ -182,7 +182,7 @@ export const PreferencesModal: React.FC<PreferencesModalProps> = ({
                   value={apiKey}
                   onChange={(e) => setApiKey(e.target.value)}
                   placeholder="sk-..."
-                  className="bg-gray-800 border-gray-600 text-white placeholder:text-gray-400"
+                  className="bg-neutral-800 border-gray-600 text-white placeholder:text-gray-400"
                 />
                 <div className="flex gap-2">
                   <Button
@@ -240,7 +240,7 @@ export const PreferencesModal: React.FC<PreferencesModalProps> = ({
                 value={bulkInput}
                 onChange={(e) => setBulkInput(e.target.value)}
                 placeholder="Paste preferences here. Use 'Interested: term' or 'Not Interested: term' format, or just enter terms (defaults to interested). Separate with empty lines."
-                className="bg-gray-800 border-gray-600 text-white placeholder:text-gray-400 min-h-[100px]"
+                className="bg-neutral-800 border-gray-600 text-white placeholder:text-gray-400 min-h-[100px]"
               />
               <div className="flex gap-2">
                 <Button
@@ -257,7 +257,7 @@ export const PreferencesModal: React.FC<PreferencesModalProps> = ({
                   }}
                   size="sm"
                   variant="outline"
-                  className="border-gray-600 text-gray-300 hover:bg-gray-800"
+                  className="border-gray-600 text-gray-300 hover:bg-neutral-800"
                 >
                   Cancel
                 </Button>
@@ -277,7 +277,7 @@ export const PreferencesModal: React.FC<PreferencesModalProps> = ({
                   onChange={(e) => setNewInterest(e.target.value)}
                   onKeyPress={(e) => handleKeyPress(e, handleAddInterest)}
                   placeholder="e.g., React, Remote work, Senior"
-                  className="flex-1 bg-gray-800 border-gray-600 text-white placeholder:text-gray-400"
+                  className="flex-1 bg-neutral-800 border-gray-600 text-white placeholder:text-gray-400"
                 />
                 <Button
                   onClick={handleAddInterest}
@@ -291,7 +291,7 @@ export const PreferencesModal: React.FC<PreferencesModalProps> = ({
                 {preferences.interested.map((interest, index) => (
                   <div
                     key={index}
-                    className="flex items-center justify-between bg-gray-800 px-3 py-2 rounded"
+                    className="flex items-center justify-between bg-neutral-800 px-3 py-2 rounded"
                   >
                     <span className="text-white text-sm flex-1">
                       {interest}
@@ -332,7 +332,7 @@ export const PreferencesModal: React.FC<PreferencesModalProps> = ({
                   onChange={(e) => setNewExclusion(e.target.value)}
                   onKeyPress={(e) => handleKeyPress(e, handleAddExclusion)}
                   placeholder="e.g., PHP, On-site only, Junior"
-                  className="flex-1 bg-gray-800 border-gray-600 text-white placeholder:text-gray-400"
+                  className="flex-1 bg-neutral-800 border-gray-600 text-white placeholder:text-gray-400"
                 />
                 <Button
                   onClick={handleAddExclusion}
@@ -346,7 +346,7 @@ export const PreferencesModal: React.FC<PreferencesModalProps> = ({
                 {preferences.notInterested.map((exclusion, index) => (
                   <div
                     key={index}
-                    className="flex items-center justify-between bg-gray-800 px-3 py-2 rounded"
+                    className="flex items-center justify-between bg-neutral-800 px-3 py-2 rounded"
                   >
                     <span className="text-white text-sm flex-1">
                       {exclusion}
