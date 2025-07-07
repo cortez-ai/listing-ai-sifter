@@ -1,9 +1,13 @@
-
-import React, { useState, useEffect } from 'react';
-import { ArrowLeft, ChevronDown, ChevronUp } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { useNavigate } from 'react-router-dom';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Button } from "@/components/ui/button";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { ArrowLeft, ChevronDown, ChevronUp } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import Markdown from "react-markdown";
+import { useNavigate } from "react-router-dom";
 
 interface AnalysisResults {
   originalInput: string;
@@ -17,17 +21,17 @@ export const ResultsPage: React.FC = () => {
   const [showOriginal, setShowOriginal] = useState(false);
 
   useEffect(() => {
-    const saved = sessionStorage.getItem('analysisResults');
+    const saved = sessionStorage.getItem("analysisResults");
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
         setResults(parsed);
       } catch (error) {
-        console.error('Failed to parse results:', error);
-        navigate('/');
+        console.error("Failed to parse results:", error);
+        navigate("/");
       }
     } else {
-      navigate('/');
+      navigate("/");
     }
   }, [navigate]);
 
@@ -45,17 +49,16 @@ export const ResultsPage: React.FC = () => {
         {/* Header */}
         <div className="flex items-center gap-4">
           <Button
-            onClick={() => navigate('/')}
+            onClick={() => navigate("/")}
             variant="outline"
             size="sm"
-            className="border-gray-600 text-gray-300 hover:bg-gray-700"
+            className="border-teal-600 text-teal-500 hover:bg-teal-600 hover:text-white"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back
           </Button>
           <h1 className="text-2xl font-bold text-white">Filtered Results</h1>
         </div>
-
         {/* Original Input (Collapsible) */}
         <div className="bg-gray-800 rounded-lg border border-gray-700">
           <Collapsible open={showOriginal} onOpenChange={setShowOriginal}>
@@ -78,17 +81,17 @@ export const ResultsPage: React.FC = () => {
             </CollapsibleContent>
           </Collapsible>
         </div>
-
         {/* Filtered Results */}
         <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
-          <h2 className="text-xl font-semibold text-white mb-4">Filtered Job Listings</h2>
+          <h2 className="text-xl font-semibold text-white mb-4">
+            Filtered Job Listings
+          </h2>
           <div className="bg-gray-900 rounded p-4">
-            <div className="text-gray-100 whitespace-pre-wrap">
-              {results.filteredResults}
+            <div className="text-gray-100 prose prose-invert max-w-none">
+              <Markdown>{results.filteredResults}</Markdown>
             </div>
           </div>
         </div>
-
         {/* Analysis Info */}
         <div className="text-center text-gray-400 text-sm">
           Analysis completed at {new Date(results.timestamp).toLocaleString()}

@@ -66,7 +66,8 @@ ${jobListings}`;
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "gpt-4o-mini",
+        // suggestions: gpt-4o-mini gpt-4o o3 gpt-4.1
+        model: "gpt-4.1",
         messages: [
           {
             role: "user",

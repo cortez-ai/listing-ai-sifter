@@ -1,21 +1,23 @@
-
-import React, { useState } from 'react';
-import { Settings, Loader2, AlertCircle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { useApp } from '@/contexts/AppContext';
-import { PreferencesModal } from './PreferencesModal';
-import { hasOpenAIApiKey } from '@/services/aiService';
-import { useNavigate } from 'react-router-dom';
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { useApp } from "@/contexts/AppContext";
+import { hasOpenAIApiKey } from "@/services/aiService";
+import { AlertCircle, Loader2, Settings } from "lucide-react";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { PreferencesModal } from "./PreferencesModal";
 
 interface JobListingInputProps {
   onAnalyze: (jobListings: string) => void;
   isAnalyzing: boolean;
 }
 
-export const JobListingInput: React.FC<JobListingInputProps> = ({ onAnalyze, isAnalyzing }) => {
+export const JobListingInput: React.FC<JobListingInputProps> = ({
+  onAnalyze,
+  isAnalyzing,
+}) => {
   const { hasPreferences } = useApp();
-  const [jobListings, setJobListings] = useState('');
+  const [jobListings, setJobListings] = useState("");
   const [showPreferences, setShowPreferences] = useState(false);
   const navigate = useNavigate();
   const hasApiKey = hasOpenAIApiKey();
@@ -26,14 +28,17 @@ export const JobListingInput: React.FC<JobListingInputProps> = ({ onAnalyze, isA
     }
   };
 
-  const canAnalyze = jobListings.trim() && hasPreferences && hasApiKey && !isAnalyzing;
+  const canAnalyze =
+    jobListings.trim() && hasPreferences && hasApiKey && !isAnalyzing;
 
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-6">
       {/* Header with preferences button */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-white mb-2">Job Listing Filter</h1>
+          <h1 className="text-3xl font-bold text-white mb-2">
+            Job Listing Filter
+          </h1>
           {!hasPreferences && (
             <p className="text-gray-400 text-sm">
               Configure your preferences to start filtering job listings
@@ -49,7 +54,7 @@ export const JobListingInput: React.FC<JobListingInputProps> = ({ onAnalyze, isA
         <Button
           onClick={() => setShowPreferences(true)}
           variant="outline"
-          className="border-teal-600 text-teal-400 hover:bg-teal-600 hover:text-white"
+          className="border-teal-600 text-teal-500 hover:bg-teal-600 hover:text-white"
         >
           <Settings className="h-4 w-4 mr-2" />
           Preferences
@@ -81,7 +86,7 @@ export const JobListingInput: React.FC<JobListingInputProps> = ({ onAnalyze, isA
               Analyzing with AI...
             </>
           ) : (
-            'Analyze Job Listings with AI'
+            "Analyze Job Listings with AI"
           )}
         </Button>
 
@@ -90,7 +95,7 @@ export const JobListingInput: React.FC<JobListingInputProps> = ({ onAnalyze, isA
             Please set up your preferences before analyzing job listings
           </p>
         )}
-        
+
         {!hasApiKey && (
           <p className="text-center text-amber-400 text-sm">
             Please add your OpenAI API key in preferences to enable AI analysis
