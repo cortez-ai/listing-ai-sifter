@@ -1,12 +1,13 @@
 
 import { Preferences } from '@/contexts/AppContext';
 
-const OPENAI_API_KEY = localStorage.getItem('openai_api_key');
-
 export const analyzeJobListings = async (
   jobListings: string,
   preferences: Preferences
 ): Promise<string> => {
+  
+  // Get the API key fresh each time the function is called
+  const OPENAI_API_KEY = localStorage.getItem('openai_api_key');
   
   if (!OPENAI_API_KEY) {
     throw new Error('OpenAI API key not found. Please add your API key in the preferences.');
@@ -97,4 +98,9 @@ export const setOpenAIApiKey = (apiKey: string) => {
 // Function to check if API key exists
 export const hasOpenAIApiKey = (): boolean => {
   return !!localStorage.getItem('openai_api_key');
+};
+
+// Function to get API key
+export const getOpenAIApiKey = (): string | null => {
+  return localStorage.getItem('openai_api_key');
 };

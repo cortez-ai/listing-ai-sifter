@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Plus, Trash2, Copy, ClipboardPaste, Key } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -8,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useApp } from '@/contexts/AppContext';
 import { toast } from '@/hooks/use-toast';
-import { setOpenAIApiKey, hasOpenAIApiKey } from '@/services/aiService';
+import { setOpenAIApiKey, hasOpenAIApiKey, getOpenAIApiKey } from '@/services/aiService';
 
 interface PreferencesModalProps {
   open: boolean;
@@ -23,6 +22,14 @@ export const PreferencesModal: React.FC<PreferencesModalProps> = ({ open, onOpen
   const [showBulkInput, setShowBulkInput] = useState(false);
   const [apiKey, setApiKey] = useState('');
   const [showApiKeyInput, setShowApiKeyInput] = useState(false);
+
+  // Load current API key when modal opens
+  useEffect(() => {
+    if (open) {
+      const currentApiKey = getOpenAIApiKey();
+      setApiKey(currentApiKey || '');
+    }
+  }, [open]);
 
   const handleAddInterest = () => {
     if (newInterest.trim()) {
@@ -107,7 +114,6 @@ export const PreferencesModal: React.FC<PreferencesModalProps> = ({ open, onOpen
   const handleSaveApiKey = () => {
     if (apiKey.trim()) {
       setOpenAIApiKey(apiKey.trim());
-      setApiKey('');
       setShowApiKeyInput(false);
       toast({
         title: "API Key Saved",
@@ -148,7 +154,7 @@ export const PreferencesModal: React.FC<PreferencesModalProps> = ({ open, onOpen
             {showApiKeyInput && (
               <div className="space-y-2">
                 <Input
-                  type="password"
+                  type="text"
                   value={apiKey}
                   onChange={(e) => setApiKey(e.target.value)}
                   placeholder="sk-..."
@@ -164,7 +170,7 @@ export const PreferencesModal: React.FC<PreferencesModalProps> = ({ open, onOpen
                   </Button>
                   <Button
                     onClick={() => {
-                      setApiKey('');
+                      setApiKey(getOpenAIApiKey() || '');
                       setShowApiKeyInput(false);
                     }}
                     size="sm"
