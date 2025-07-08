@@ -94,6 +94,9 @@ export const ResultsPage: React.FC = () => {
                     <a
                       href={href}
                       className="font-bold text-blue-400 hover:underline"
+                      target="_blank"
+                      referrerPolicy="origin-when-cross-origin"
+                      rel="noopener"
                     >
                       {children}
                     </a>
