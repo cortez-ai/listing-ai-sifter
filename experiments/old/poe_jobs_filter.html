@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Job Listing Filter for Software Engineers</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#5D5CDE",
+            },
+          },
+        },
+      };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  </head>
+  <body
+    class="bg-white dark:bg-[#181818] text-gray-800 dark:text-gray-200 min-h-screen"
+  >
+    <div class="container mx-auto px-4 py-8 max-w-4xl">
+      <!-- App header -->
+      <header class="mb-8">
+        <h1 class="text-3xl font-bold text-primary mb-2">Job Listing Filter</h1>
+        <p class="text-gray-600 dark:text-gray-400">
+          Easily filter job listings to find the perfect match for your software
+          engineering career.
+        </p>
+      </header>
+
+      <!-- Preferences section -->
+      <div class="mb-8 grid md:grid-cols-2 gap-4">
+        <div class="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
+          <h2 class="text-xl font-semibold mb-3 text-primary">Interests</h2>
+          <p class="text-sm mb-2">
+            Add bullet points of technologies, roles, or aspects you're
+            interested in:
+          </p>
+          <textarea
+            id="interested"
+            class="w-full h-32 p-3 border rounded-md bg-white dark:bg-gray-800 dark:text-gray-200 text-base"
+            placeholder="* JavaScript
+* Remote work
+* AI/ML projects"
+          ></textarea>
+        </div>
+        <div class="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
+          <h2 class="text-xl font-semibold mb-3 text-primary">
+            Not Interested
+          </h2>
+          <p class="text-sm mb-2">
+            Add bullet points of what you want to avoid:
+          </p>
+          <textarea
+            id="not-interested"
+            class="w-full h-32 p-3 border rounded-md bg-white dark:bg-gray-800 dark:text-gray-200 text-base"
+            placeholder="* PHP
+* On-site only
+* Defense industry"
+          ></textarea>
+        </div>
+      </div>
+
+      <!-- Job listings input -->
+      <div class="mb-6">
+        <h2 class="text-xl font-semibold mb-3 text-primary">Job Listings</h2>
+        <p class="text-sm mb-2">
+          Paste a list of job titles OR full job descriptions:
+        </p>
+        <textarea
+          id="job-listings"
+          class="w-full h-64 p-3 border rounded-md bg-white dark:bg-gray-800 dark:text-gray-200 text-base"
+          placeholder="Paste multiple job titles or descriptions here..."
+        ></textarea>
+      </div>
+
+      <!-- Analysis button -->
+      <div class="mb-8 flex justify-center">
+        <button
+          id="analyze-btn"
+          class="px-6 py-3 bg-primary text-white font-medium rounded-md hover:bg-opacity-90 transition-all"
+        >
+          Analyze Listings
+        </button>
+      </div>
+
+      <!-- Results section -->
+      <div id="results-container" class="hidden">
+        <h2 class="text-xl font-semibold mb-3 text-primary flex items-center">
+          <span>Results</span>
+          <span
+            id="list-type"
+            class="ml-2 text-sm font-normal px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded-md"
+          ></span>
+        </h2>
+        <div
+          id="results"
+          class="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg min-h-64"
+        ></div>
+      </div>
+
+      <!-- Loading indicator -->
+      <div
+        id="loading"
+        class="hidden flex flex-col items-center justify-center py-8"
+      >
+        <div
+          class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"
+        ></div>
+        <p class="mt-4 text-gray-600 dark:text-gray-400">
+          Analyzing job listings...
+        </p>
+      </div>
+    </div>
+
+    <script>
+      // Dark mode detection
+      if (
+        window.matchMedia &&
+        window.matchMedia("(prefers-color-scheme: dark)").matches
+      ) {
+        document.documentElement.classList.add("dark");
+      }
+      window
+        .matchMedia("(prefers-color-scheme: dark)")
+        .addEventListener("change", (event) => {
+          if (event.matches) {
+            document.documentElement.classList.add("dark");
+          } else {
+            document.documentElement.classList.remove("dark");
+          }
+        });
+
+      // Main app logic
+      document.addEventListener("DOMContentLoaded", function () {
+        const analyzeBtn = document.getElementById("analyze-btn");
+        const jobListings = document.getElementById("job-listings");
+        const interested = document.getElementById("interested");
+        const notInterested = document.getElementById("not-interested");
+        const resultsContainer = document.getElementById("results-container");
+        const results = document.getElementById("results");
+        const listType = document.getElementById("list-type");
+        const loading = document.getElementById("loading");
+
+        analyzeBtn.addEventListener("click", async function () {
+          // Validate inputs
+          if (!jobListings.value.trim()) {
+            alert("Please paste job listings first.");
+            return;
+          }
+
+          // Show loading state
+          loading.classList.remove("hidden");
+          resultsContainer.classList.add("hidden");
+
+          try {
+            // Prepare user preferences
+            const userInterests = interested.value.trim();
+            const userAvoidance = notInterested.value.trim();
+            const listings = jobListings.value.trim();
+
+            // Call Claude to analyze the job listings
+            await analyzeJobListings(listings, userInterests, userAvoidance);
+          } catch (error) {
+            results.innerHTML = `<p class="text-red-500">Error: ${error.message}</p>`;
+            resultsContainer.classList.remove("hidden");
+          } finally {
+            loading.classList.add("hidden");
+          }
+        });
+
+        async function analyzeJobListings(listings, interests, avoidance) {
+          // Register a handler for the bot's response
+          const handlerId = "job-analysis-handler";
+
+          window.Poe.registerHandler(handlerId, (result) => {
+            if (result.responses.length === 0) return;
+
+            const response = result.responses[0];
+
+            if (response.status === "error") {
+              results.innerHTML = `<p class="text-red-500">Error: ${
+                response.statusText || "Failed to analyze job listings"
+              }</p>`;
+              resultsContainer.classList.remove("hidden");
+            } else if (response.status === "incomplete") {
+              // Show partial results while streaming
+              results.innerHTML = `<div class="prose dark:prose-invert max-w-none">${marked.parse(
+                response.content
+              )}</div>`;
+              resultsContainer.classList.remove("hidden");
+            } else if (response.status === "complete") {
+              // Extract if it's titles or descriptions from the response
+              const responseText = response.content.toLowerCase();
+              if (
+                responseText.includes("list of titles detected") ||
+                responseText.includes("job titles")
+              ) {
+                listType.textContent = "Job Titles";
+              } else if (
+                responseText.includes("list of descriptions detected") ||
+                responseText.includes("job descriptions")
+              ) {
+                listType.textContent = "Job Descriptions";
+              } else {
+                listType.textContent = "Results";
+              }
+
+              // Update with final content with Markdown parsing
+              results.innerHTML = `<div class="prose dark:prose-invert max-w-none">${marked.parse(
+                response.content
+              )}</div>`;
+              resultsContainer.classList.remove("hidden");
+            }
+          });
+
+          // Build the prompt for Claude
+          const prompt = `
+                I'm going to give you a list of job listings (either titles or descriptions) that you need to filter for relevance.
+
+                First, determine if I've provided a list of job titles or full descriptions.
+
+                INTERESTS:
+                ${interests || "None specified"}
+
+                NOT INTERESTED IN:
+                ${avoidance || "None specified"}
+
+                JOB LISTINGS:
+                ${listings}
+
+                If these are JOB TITLES:
+                1. Filter the titles keeping only those that match my interests and avoid my dislikes
+                2. Return only the filtered titles in a bullet list
+                3. Start with "List of Titles Detected:" and then list the matching titles
+
+                If these are JOB DESCRIPTIONS:
+                1. Filter the descriptions keeping only those that match my interests and avoid my dislikes
+                2. For each relevant description, provide a brief summary (2-3 sentences)
+                3. Add 1-2 bullet points explaining why it's a good match for me
+                4. Start with "List of Descriptions Detected:" followed by the summaries
+
+                If you're unsure if it's titles or descriptions, make your best guess based on the length and content.
+                `;
+
+          try {
+            // Send the message to Claude for analysis
+            await window.Poe.sendUserMessage("@Claude-3.7-Sonnet " + prompt, {
+              handler: handlerId,
+              stream: true,
+              openChat: false,
+            });
+          } catch (err) {
+            results.innerHTML = `<p class="text-red-500">Error: ${
+              err.message || err
+            }</p>`;
+            resultsContainer.classList.remove("hidden");
+            loading.classList.add("hidden");
+          }
+        }
+      });
+    </script>
+  </body>
+</html>
