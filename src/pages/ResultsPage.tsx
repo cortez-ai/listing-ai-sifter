@@ -88,7 +88,27 @@ export const ResultsPage: React.FC = () => {
           </h2>
           <div className="bg-neutral-900 rounded p-4">
             <div className="text-gray-100 prose prose-invert max-w-none">
-              <Markdown>{results.filteredResults}</Markdown>
+              <Markdown
+                components={{
+                  a: ({ href, children }) => (
+                    <a
+                      href={href}
+                      className="font-bold text-blue-400 hover:underline"
+                    >
+                      {children}
+                    </a>
+                  ),
+                  h1: ({ children }) => (
+                    <h1 className="text-2xl font-bold mb-4">{children}</h1>
+                  ),
+                  h2: ({ children }) => (
+                    <h2 className="text-xl font-semibold mb-3">{children}</h2>
+                  ),
+                  p: ({ children }) => <p className="mb-3">{children}</p>,
+                }}
+              >
+                {results.filteredResults}
+              </Markdown>{" "}
             </div>
           </div>
         </div>
