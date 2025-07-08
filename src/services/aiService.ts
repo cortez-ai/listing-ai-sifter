@@ -51,6 +51,7 @@ If these are JOB DESCRIPTIONS:
 1. Filter the descriptions keeping only those that match my interests and avoid my dislikes
 2. For each relevant description, provide a brief summary (2-3 sentences)
 3. Add 1-2 bullet points explaining why it's a good match for me
+4. Add a link to the job listing. If you find more than one url for a listing, add 3 at most.
 4. Start with "List of Descriptions Detected:" followed by the summaries
 
 If you're unsure if it's titles or descriptions, make your best guess based on the length and content.
